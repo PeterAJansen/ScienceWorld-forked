@@ -8,10 +8,12 @@ import scienceworld.tasks.specifictasks.{TaskChangeOfState, TaskChemistryMix, Ta
 import scala.collection.mutable
 import scala.util.Random
 
-class TaskMaker1 {
+class TaskMaker1() {
   val tasks = mutable.Map[String, TaskParametric]()
   // Constructor
-  this.registerTasks()
+  //this.registerTasks(onlySpecificTask)
+  // Only register this task set, for speed
+  TaskFindLivingNonLiving.registerTasks(this)
 
   /*
    * Accessors
@@ -84,7 +86,7 @@ class TaskMaker1 {
    * Register tasks
    */
   // TODO: Add list of tasks here
-  private def registerTasks(): Unit = {
+  private def registerTasks(onlySpecificTasks:Int): Unit = {
     TaskChangeOfState.registerTasks(this)
     TaskElectricCircuit.registerTasks(this)
     TaskElectricalConductivity.registerTasks(this)

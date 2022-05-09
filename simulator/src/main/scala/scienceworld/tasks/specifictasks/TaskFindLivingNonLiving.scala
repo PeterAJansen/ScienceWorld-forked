@@ -362,10 +362,10 @@ object TaskFindLivingNonLiving {
 
 
   def registerTasks(taskMaker:TaskMaker1): Unit = {
-    taskMaker.addTask( new TaskFindLivingNonLiving(mode = MODE_LIVING) )
+    //taskMaker.addTask( new TaskFindLivingNonLiving(mode = MODE_LIVING) )
     taskMaker.addTask( new TaskFindLivingNonLiving(mode = MODE_NONLIVING) )
-    taskMaker.addTask( new TaskFindLivingNonLiving(mode = MODE_PLANT) )
-    taskMaker.addTask( new TaskFindLivingNonLiving(mode = MODE_ANIMAL) )
+    //taskMaker.addTask( new TaskFindLivingNonLiving(mode = MODE_PLANT) )
+    //taskMaker.addTask( new TaskFindLivingNonLiving(mode = MODE_ANIMAL) )
   }
 
 

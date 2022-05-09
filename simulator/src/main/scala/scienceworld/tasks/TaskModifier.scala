@@ -35,11 +35,11 @@ class TaskObject(val name:String, val exampleInstance:Option[EnvObject], val roo
   // Add a given object to a given room.
   // TODO: Doesn't currently use 'generateNear' parameter.
   override def runModifier(universe: EnvObject, agent: Agent): Boolean = {
-    println ("#### TaskObject: Running for (" + name + "), roomToGenerateIn(" + roomToGenerateIn + ")")
+    //##println ("#### TaskObject: Running for (" + name + "), roomToGenerateIn(" + roomToGenerateIn + ")")
 
     // Step 1: Check to see if the object is marked as required to be generated
     if (!needsToBeGenerated) {
-      println ("### TaskObject: Object (" + name + ") does not need to be generated.")
+      //##println ("### TaskObject: Object (" + name + ") does not need to be generated.")
       return true
     }
 
@@ -47,7 +47,7 @@ class TaskObject(val name:String, val exampleInstance:Option[EnvObject], val roo
     val allObjects:Set[EnvObject] = universe.getContainedObjectsAndPortalsRecursive()
     for (obj <- allObjects) {
       if (obj.name == roomToGenerateIn) {
-        println ("Found room (" + roomToGenerateIn + ")")
+        //##println ("Found room (" + roomToGenerateIn + ")")
         // First, check to see if the object already exists
         if ((possibleContainerNames.length == 0) || ((possibleContainerNames.length == 1) && (possibleContainerNames(0).length == 0))) {
           // CASE 1: Just generate in the main container
@@ -61,7 +61,7 @@ class TaskObject(val name:String, val exampleInstance:Option[EnvObject], val roo
           for (cObj <- containedObjects) {
             if (cObj.name == name) {
               // An existing object with this name has been found -- exit
-              println("### TaskObject: Existing object with that name (" + name + ") has been found in container (" + obj.name + ")")
+              //##println("### TaskObject: Existing object with that name (" + name + ") has been found in container (" + obj.name + ")")
               if (!forceAdd) return true
             }
           }
