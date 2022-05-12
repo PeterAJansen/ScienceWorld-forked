@@ -95,7 +95,7 @@ object OfflineCrawler {
 
       val differences = newActionSeqSet.diff(goldPathSet)
       if (differences.size <= maxDistance) {
-        println("** Calling: " + newActionSeq.mkString(", "))
+        println("** Calling: " + newActionSeq.mkString(", ") + " (differences: " + differences.mkString(", ") + ")")
         crawlAroundGoldPath(taskIdx, varIdx, newActionSeq, maxDistance, simplificationStr, goldPath, goldPathSet)
       } else {
         println("Gold Path: " + goldPath.mkString(", "))
