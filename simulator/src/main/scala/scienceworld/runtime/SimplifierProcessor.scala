@@ -90,6 +90,13 @@ class SimplificationSelfWateringFlowerPots extends Simplification(label = SIMPLI
 
 }
 
+/*
+ * Navigation actions only
+ */
+class SimplificationOnlyNavigationActions extends Simplification(label = SIMPLIFICATION_NAVIGATION_ONLY, description = "Only navigation actions.") {
+
+}
+
 
 
 /*
@@ -104,6 +111,7 @@ object SimplifierProcessor {
   val SIMPLIFICATION_OPEN_DOORS                 = "openDoors"
   val SIMPLIFICATION_OPEN_CONTAINERS            = "openContainers"
   val SIMPLIFICATION_SELF_WATERING_FLOWER_POTS  = "selfWateringFlowerPots"
+  val SIMPLIFICATION_NAVIGATION_ONLY            = "navigationOnly"
 
   // Accessors
   def addSimplification(simplification:Simplification): Unit = {
@@ -208,6 +216,8 @@ object SimplifierProcessor {
     out.append( new SimplificationNoElectricalActions() )
 
     out.append( new SimplificationSelfWateringFlowerPots() )
+
+    out.append( new SimplificationOnlyNavigationActions() )
 
     return out.toArray
   }

@@ -3,7 +3,7 @@ package scienceworld.tasks
 import scienceworld.objects.agent.Agent
 import scienceworld.runtime.pythonapi.PythonInterface
 import scienceworld.struct.EnvObject
-import scienceworld.tasks.specifictasks.{TaskChangeOfState, TaskChemistryMix, TaskChemistryMixPaint, TaskElectricCircuit, TaskElectricalConductivity, TaskElectricalConductivity2, TaskFindLivingNonLiving, TaskGrowPlant, TaskIdentifyLifeStages1, TaskIdentifyLifeStages2, TaskInclinedPlane1, TaskInclinedPlane2, TaskInclinedPlane3, TaskLifeSpan, TaskMendelialGenetics2, TaskMendelianGenetics1, TaskParametric, TaskUseInstrumentThermometer, TaskUseInstrumentThermometer2, TaskUseInstrumentThermometer3}
+import scienceworld.tasks.specifictasks.{TaskChangeOfState, TaskChemistryMix, TaskChemistryMixPaint, TaskElectricCircuit, TaskElectricalConductivity, TaskElectricalConductivity2, TaskFindLivingNonLiving, TaskGrowPlant, TaskIdentifyLifeStages1, TaskIdentifyLifeStages2, TaskInclinedPlane1, TaskInclinedPlane2, TaskInclinedPlane3, TaskLifeSpan, TaskMendelialGenetics2, TaskMendelianGenetics1, TaskParametric, TaskSimpleNavigation, TaskUseInstrumentThermometer, TaskUseInstrumentThermometer2, TaskUseInstrumentThermometer3}
 
 import scala.collection.mutable
 import scala.util.Random
@@ -12,8 +12,10 @@ class TaskMaker1() {
   val tasks = mutable.Map[String, TaskParametric]()
   // Constructor
   //this.registerTasks(onlySpecificTask)
+
   // Only register this task set, for speed
-  TaskFindLivingNonLiving.registerTasks(this)
+  //##TaskFindLivingNonLiving.registerTasks(this)
+  TaskSimpleNavigation.registerTasks(this)
 
   /*
    * Accessors
@@ -106,6 +108,8 @@ class TaskMaker1() {
     TaskUseInstrumentThermometer.registerTasks(this)
     TaskUseInstrumentThermometer2.registerTasks(this)
     TaskUseInstrumentThermometer3.registerTasks(this)
+
+    TaskSimpleNavigation.registerTasks(this)
   }
 
 

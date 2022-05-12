@@ -58,6 +58,8 @@ object OfflineCrawler {
     // Get info for this node
     val (description, score, isCompleted, validActions) = runActionSequence(taskIdx, varIdx, actionsSoFar, simplificationStr)
 
+    println ("Valid actions: " + validActions.mkString(", "))
+
     for (actionStr <- validActions) {
       val actionStart = actionStr.split(" ")(0)   // Only continue with this action if it's on the list of allowed actions
       if (allowableActionStarts.contains(actionStart)) {
@@ -95,7 +97,10 @@ object OfflineCrawler {
       allowableActionStarts.add(actionName)
     }
 
-    this.crawlToDepth(taskIdx, varIdx, actionsSoFar = Array.empty[String], maxDepth = 3, allowableActionStarts.toSet, simplificationStr = "easy")
+
+    //val simplificationStr = "easy"
+    val simplificationStr = "navigationOnly"
+    this.crawlToDepth(taskIdx, varIdx, actionsSoFar = Array.empty[String], maxDepth = 3, allowableActionStarts.toSet, simplificationStr)
 
     val deltaTime = System.currentTimeMillis() - startTime
     println("Total execution time: " + deltaTime + " msec")

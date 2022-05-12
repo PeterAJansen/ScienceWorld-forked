@@ -75,48 +75,52 @@ object ActionDefinitions {
     ActionLookAt.registerAction(actionHandler)
     ActionLookIn.registerAction(actionHandler)
 
-    // Activate/Deactivate
-    ActionActivate.registerAction(actionHandler)
-    ActionDeactivate.registerAction(actionHandler)
+    if (!SimplifierProcessor.isSimplificationEnabled(label = SIMPLIFICATION_NAVIGATION_ONLY)) {
+      // Activate/Deactivate
+      ActionActivate.registerAction(actionHandler)
+      ActionDeactivate.registerAction(actionHandler)
 
-    // Eat
-    ActionEat.registerAction(actionHandler)
+      // Eat
+      ActionEat.registerAction(actionHandler)
 
-    // Move an object to a new container
-    ActionMoveObject.registerAction(actionHandler)
-    ActionPourObject.registerAction(actionHandler)
-    ActionDunkObject.registerAction(actionHandler)
+      // Move an object to a new container
+      ActionMoveObject.registerAction(actionHandler)
+      ActionPourObject.registerAction(actionHandler)
+      ActionDunkObject.registerAction(actionHandler)
 
-    // Focus on object
-    ActionFocus.registerAction(actionHandler)
-    ActionResetTask.registerAction(actionHandler)
+      // Focus on object
+      ActionFocus.registerAction(actionHandler)
+      ActionResetTask.registerAction(actionHandler)
 
-    // Use device
-    ActionUseDevice.registerAction(actionHandler)
+      // Use device
+      ActionUseDevice.registerAction(actionHandler)
 
-    // Read
-    ActionRead.registerAction(actionHandler)
+      // Read
+      ActionRead.registerAction(actionHandler)
 
-    // Flush
-    ActionFlush.registerAction(actionHandler)
+      // Flush
+      ActionFlush.registerAction(actionHandler)
 
-    // Connect (electrically)
-    if (!SimplifierProcessor.isSimplificationEnabled(label = SIMPLIFICATION_NO_ELECTRICAL_ACTION)) {
-      ActionConnectElectrical.registerAction(actionHandler)
-      ActionDisconnectElectrical.registerAction(actionHandler)
+      // Mix
+      ActionMix.registerAction(actionHandler)
+
+      // Connect (electrically)
+      if (!SimplifierProcessor.isSimplificationEnabled(label = SIMPLIFICATION_NO_ELECTRICAL_ACTION)) {
+        ActionConnectElectrical.registerAction(actionHandler)
+        ActionDisconnectElectrical.registerAction(actionHandler)
+      }
+
+      // Wait
+      ActionWait1.registerAction(actionHandler)
+      ActionWait10.registerAction(actionHandler)
+
+      // Inventory
+      ActionInventory.registerAction(actionHandler)
+      ActionPickUpObjectIntoInventory.registerAction(actionHandler)
+      ActionPutDownObjectIntoInventory.registerAction(actionHandler)
     }
 
-    // Wait
-    ActionWait1.registerAction(actionHandler)
-    ActionWait10.registerAction(actionHandler)
 
-    // Inventory
-    ActionInventory.registerAction(actionHandler)
-    ActionPickUpObjectIntoInventory.registerAction(actionHandler)
-    ActionPutDownObjectIntoInventory.registerAction(actionHandler)
-
-    // Mix
-    ActionMix.registerAction(actionHandler)
 
     // Task description
     ActionTaskDesc.registerAction(actionHandler)
@@ -148,48 +152,50 @@ object ActionDefinitions {
     out.insertAll(out.length, ActionLookAt.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
     out.insertAll(out.length, ActionLookIn.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
 
-    // Activate/Deactivate
-    out.insertAll(out.length, ActionActivate.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
-    out.insertAll(out.length, ActionDeactivate.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
+    if (!SimplifierProcessor.isSimplificationEnabled(label = SIMPLIFICATION_NAVIGATION_ONLY)) {
+      // Activate/Deactivate
+      out.insertAll(out.length, ActionActivate.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
+      out.insertAll(out.length, ActionDeactivate.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
 
-    // Eat
-    out.insertAll(out.length, ActionEat.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
+      // Eat
+      out.insertAll(out.length, ActionEat.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
 
-    // Move an object to a new container
-    out.insertAll(out.length, ActionMoveObject.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
-    out.insertAll(out.length, ActionPourObject.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
-    out.insertAll(out.length, ActionDunkObject.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
+      // Move an object to a new container
+      out.insertAll(out.length, ActionMoveObject.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
+      out.insertAll(out.length, ActionPourObject.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
+      out.insertAll(out.length, ActionDunkObject.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
 
-    // Focus on object
-    out.insertAll(out.length, ActionFocus.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
-    out.insertAll(out.length, ActionResetTask.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
+      // Focus on object
+      out.insertAll(out.length, ActionFocus.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
+      out.insertAll(out.length, ActionResetTask.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
 
-    // Use device
-    out.insertAll(out.length, ActionUseDevice.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
+      // Use device
+      out.insertAll(out.length, ActionUseDevice.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
 
-    // Read
-    out.insertAll(out.length, ActionRead.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
+      // Read
+      out.insertAll(out.length, ActionRead.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
 
-    // Flush
-    out.insertAll(out.length, ActionFlush.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
+      // Flush
+      out.insertAll(out.length, ActionFlush.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
 
-    // Connect (electrically)
-    if (!SimplifierProcessor.isSimplificationEnabled(label = SIMPLIFICATION_NO_ELECTRICAL_ACTION)) {
-      out.insertAll(out.length, ActionConnectElectrical.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
-      out.insertAll(out.length, ActionDisconnectElectrical.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
+      // Connect (electrically)
+      if (!SimplifierProcessor.isSimplificationEnabled(label = SIMPLIFICATION_NO_ELECTRICAL_ACTION)) {
+        out.insertAll(out.length, ActionConnectElectrical.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
+        out.insertAll(out.length, ActionDisconnectElectrical.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
+      }
+
+      // Wait
+      out.insertAll(out.length, ActionWait1.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
+      out.insertAll(out.length, ActionWait10.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
+
+      // Mix
+      out.insertAll(out.length, ActionMix.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
+
+      // Inventory
+      out.insertAll(out.length, ActionInventory.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
+      out.insertAll(out.length, ActionPickUpObjectIntoInventory.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
+      out.insertAll(out.length, ActionPutDownObjectIntoInventory.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
     }
-
-    // Wait
-    out.insertAll(out.length, ActionWait1.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
-    out.insertAll(out.length, ActionWait10.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
-
-    // Inventory
-    out.insertAll(out.length, ActionInventory.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
-    out.insertAll(out.length, ActionPickUpObjectIntoInventory.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
-    out.insertAll(out.length, ActionPutDownObjectIntoInventory.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
-
-    // Mix
-    out.insertAll(out.length, ActionMix.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
 
     // Task Description
     out.insertAll(out.length, ActionTaskDesc.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
