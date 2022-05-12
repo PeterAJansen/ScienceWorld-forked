@@ -159,7 +159,6 @@ class GoalSequence(val subgoals:Array[Goal], optionalUnorderedSubgoals:Array[Goa
    */
 
   def tick(objMonitor: ObjMonitor, agent:Agent): Unit = {
-    println("GOAL SEQUENCE: TICK")
     this.tickOrderedSubgoals(objMonitor, agent)
     this.tickUnorderedSubgoals(objMonitor, agent)
   }
@@ -221,7 +220,7 @@ class GoalSequence(val subgoals:Array[Goal], optionalUnorderedSubgoals:Array[Goa
   // Checks the current subgoal for completeness.  If completed, it increments the subgoals.
   def tickOrderedSubgoals(objMonitor: ObjMonitor, agent:Agent): Unit = {
     var firstSubgoalIdx = -1
-    
+
     while (true) {
       var curSubgoal = this.getCurrentSubgoal()
       var subgoalIdx = this.curSubgoalIdx
