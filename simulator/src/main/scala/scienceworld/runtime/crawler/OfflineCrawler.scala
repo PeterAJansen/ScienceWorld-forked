@@ -52,13 +52,15 @@ object OfflineCrawler {
 
   def crawlToDepth(taskIdx:Int, varIdx:Int, actionsSoFar:Array[String], maxDepth:Int, allowableActionStarts:Set[String], simplificationStr:String = "easy"): Unit = {
 
-    // Stop condition
-    if (actionsSoFar.length > maxDepth) return
-
     // Get info for this node
     val (description, score, isCompleted, validActions) = runActionSequence(taskIdx, varIdx, actionsSoFar, simplificationStr)
 
     println ("Valid actions: " + validActions.mkString(", "))
+
+    // Stop condition
+    if (actionsSoFar.length > maxDepth) return
+
+    if (isCompleted) return
 
     for (actionStr <- validActions) {
       val actionStart = actionStr.split(" ")(0)   // Only continue with this action if it's on the list of allowed actions
@@ -68,9 +70,41 @@ object OfflineCrawler {
 
     }
 
-
   }
 
+
+  def crawlAroundGoldPath(taskIdx:Int, varIdx:Int, actionsSoFar:Array[String], maxDistance:Int, simplificationStr:String, goldPath:Array[String], goldPathSet:Set[String]): Unit = {
+
+    println("Path: " + actionsSoFar.mkString(", ") )
+    // Get info for this node
+    val (description, score, isCompleted, validActions) = runActionSequence(taskIdx, varIdx, actionsSoFar, simplificationStr)
+
+    println ("Valid actions: " + validActions.mkString(", "))
+    println ("Score: " + score)
+    println ("")
+    // Stop condition
+    if (actionsSoFar.length > goldPath.size + maxDistance) return
+
+    if (isCompleted) return
+
+    for (actionStr <- validActions) {
+      val newActionSeq = actionsSoFar ++ Array(actionStr)
+      val newActionSeqSet = newActionSeq.toSet
+
+      val differences = newActionSeqSet.diff(goldPathSet)
+      if (differences.size <= maxDistance) {
+        println("** Calling: " + newActionSeq.mkString(", "))
+        crawlAroundGoldPath(taskIdx, varIdx, newActionSeq, maxDistance, simplificationStr, goldPath, goldPathSet)
+      } else {
+        println("Gold Path: " + goldPath.mkString(", "))
+        println("Differences exceed max length: " + differences.mkString(", "))
+        println("")
+      }
+
+
+    }
+
+  }
 
 
   def main(args:Array[String]): Unit = {
@@ -97,10 +131,22 @@ object OfflineCrawler {
       allowableActionStarts.add(actionName)
     }
 
+    println("")
+    println("--------------------------------------------------------")
+    println("--------------------------------------------------------")
+    println("--------------------------------------------------------")
+    println("")
+    val taskDesc = interface.getTaskDescription()
+    println ("Task Description: " + taskDesc)
+    println("")
+    println("--------------------------------------------------------")
 
     //val simplificationStr = "easy"
     val simplificationStr = "navigationOnly"
-    this.crawlToDepth(taskIdx, varIdx, actionsSoFar = Array.empty[String], maxDepth = 3, allowableActionStarts.toSet, simplificationStr)
+    //this.crawlToDepth(taskIdx, varIdx, actionsSoFar = Array.empty[String], maxDepth = 5, allowableActionStarts.toSet, simplificationStr)
+
+    //def crawlAroundGoldPath(taskIdx:Int, varIdx:Int, actionsSoFar:Array[String], maxDistance:Int, simplificationStr:String, goldPath:Set[String]): Unit = {
+    this.crawlAroundGoldPath(taskIdx, varIdx, actionsSoFar = Array.empty[String], maxDistance = 0, simplificationStr, goldPath = goldActions, goldPathSet = goldActions.toSet)
 
     val deltaTime = System.currentTimeMillis() - startTime
     println("Total execution time: " + deltaTime + " msec")

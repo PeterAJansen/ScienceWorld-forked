@@ -14,7 +14,6 @@ class GoalMoveToLocation(locationToBeIn:String, _isOptional:Boolean = false, des
 
   override def isGoalConditionSatisfied(obj:Option[EnvObject], isFirstGoal:Boolean, gs:GoalSequence, agent:Agent):GoalReturn = {
     // NOTE: Focus object not required
-
     // If agent is not in a container, do not continue evaluation
     if (agent.getContainer().isEmpty) return GoalReturn.mkSubgoalUnsuccessful()
 

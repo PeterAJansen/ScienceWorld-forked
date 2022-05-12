@@ -159,6 +159,7 @@ class GoalSequence(val subgoals:Array[Goal], optionalUnorderedSubgoals:Array[Goa
    */
 
   def tick(objMonitor: ObjMonitor, agent:Agent): Unit = {
+    println("GOAL SEQUENCE: TICK")
     this.tickOrderedSubgoals(objMonitor, agent)
     this.tickUnorderedSubgoals(objMonitor, agent)
   }
@@ -220,14 +221,13 @@ class GoalSequence(val subgoals:Array[Goal], optionalUnorderedSubgoals:Array[Goa
   // Checks the current subgoal for completeness.  If completed, it increments the subgoals.
   def tickOrderedSubgoals(objMonitor: ObjMonitor, agent:Agent): Unit = {
     var firstSubgoalIdx = -1
-
+    
     while (true) {
       var curSubgoal = this.getCurrentSubgoal()
       var subgoalIdx = this.curSubgoalIdx
       if (firstSubgoalIdx == -1) firstSubgoalIdx = subgoalIdx
 
       if (curSubgoal.isEmpty) return
-
       // Check each object in the set of monitored objects to see if it meets a subgoal condition
       var goalReturn:GoalReturn = GoalReturn.mkSubgoalUnsuccessful()
       breakable {
@@ -235,13 +235,29 @@ class GoalSequence(val subgoals:Array[Goal], optionalUnorderedSubgoals:Array[Goa
         while (true) {
           // Do not process this subgoal if it's prerequisites haven't been met
           if (this.areSubgoalPrerequisitesCompleted(curSubgoal.get.keysMustBeCompletedBefore)) {
-            for (obj <- objMonitor.getMonitoredObjects()) {
-              //println("Checking obj (" + obj.toStringMinimal() + ") against subgoal " + curSubgoalIdx)
-              //println("## " + curSubgoal.get.getClass)
+            if (objMonitor.getMonitoredObjects().size > 0) {
+              // Case 1: For subgoals that require monitored objects
+              for (obj <- objMonitor.getMonitoredObjects()) {
+                //println("Checking obj (" + obj.toStringMinimal() + ") against subgoal " + curSubgoalIdx)
+                //println("## " + curSubgoal.get.getClass)
 
+                val isFirstGoal = if (this.getNumCompletedSubgoals() == 0) true else false
+
+                goalReturn = curSubgoal.get.isGoalConditionSatisfied(Some(obj), isFirstGoal, this, agent) // TODO: Also add a condition that checks for it with no focus?
+                if (goalReturn.subgoalSuccess) {
+                  if (curSubgoal.get.satisfiedWithObject != None) this.lastSatisfiedWithObject = curSubgoal.get.satisfiedWithObject
+                  if (curSubgoal.get.defocusOnSuccess) objMonitor.clearMonitoredObjects() // Clear focus, if the goal asks to do this
+                  if (curSubgoal.get.key.length > 0) this.completedKeys.add(curSubgoal.get.key)
+                  break()
+                }
+                if (goalReturn.taskFailure) break()
+              }
+
+            } else {
+              // Case 2: For subgoals that do not require monitored objects
               val isFirstGoal = if (this.getNumCompletedSubgoals() == 0) true else false
 
-              goalReturn = curSubgoal.get.isGoalConditionSatisfied(Some(obj), isFirstGoal, this, agent) // TODO: Also add a condition that checks for it with no focus?
+              goalReturn = curSubgoal.get.isGoalConditionSatisfied(None, isFirstGoal, this, agent) // TODO: Also add a condition that checks for it with no focus?
               if (goalReturn.subgoalSuccess) {
                 if (curSubgoal.get.satisfiedWithObject != None) this.lastSatisfiedWithObject = curSubgoal.get.satisfiedWithObject
                 if (curSubgoal.get.defocusOnSuccess) objMonitor.clearMonitoredObjects() // Clear focus, if the goal asks to do this
@@ -249,7 +265,10 @@ class GoalSequence(val subgoals:Array[Goal], optionalUnorderedSubgoals:Array[Goa
                 break()
               }
               if (goalReturn.taskFailure) break()
+
             }
+
+
           } else {
             //println("Subgoal prerequisites not met")
           }
@@ -286,6 +305,7 @@ class GoalSequence(val subgoals:Array[Goal], optionalUnorderedSubgoals:Array[Goa
       } else {
         // Current goal condition not satisfied -- return
         //println("Subgoal not satisfied.")
+
         return
       }
 

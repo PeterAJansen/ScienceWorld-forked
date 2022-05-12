@@ -675,7 +675,8 @@ object InputParser {
 
   def tokenize(inputStr:String):Array[String] = {
     val out = new ArrayBuffer[String]
-    val tokens = inputStr.trim.replaceAll("\\s+", " ").split(" ")
+    //##val tokens = inputStr.trim.replaceAll("\\s+", " ").split(" ")
+    val tokens = inputStr.split(" ")    // For speed, assuming no errorful input from action generation (saves 10% of runtime)
     for (token <- tokens) {
       if (!stopWords.contains(token)) {
         out.append(token)
