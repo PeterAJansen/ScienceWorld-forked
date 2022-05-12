@@ -149,10 +149,12 @@ object ActionDefinitions {
 
     // Look around
     out.insertAll(out.length, ActionLookAround.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
-    out.insertAll(out.length, ActionLookAt.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
-    out.insertAll(out.length, ActionLookIn.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
 
     if (!SimplifierProcessor.isSimplificationEnabled(label = SIMPLIFICATION_NAVIGATION_ONLY)) {
+      // Look at/in
+      out.insertAll(out.length, ActionLookAt.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
+      out.insertAll(out.length, ActionLookIn.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
+
       // Activate/Deactivate
       out.insertAll(out.length, ActionActivate.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
       out.insertAll(out.length, ActionDeactivate.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
