@@ -16,7 +16,7 @@ import scala.collection.mutable.ArrayBuffer
 import scala.io.StdIn.readLine
 import scala.util.control.Breaks._
 
-class AgentInterface(val universe:EnvObject, val agent:Agent, val task:Task, var simplificationStr:String = "") {
+class AgentInterface(val universe:EnvObject, val agent:Agent, val task:Task, simplifierProcessor:SimplifierProcessor, var simplificationStr:String = "") {
 
   val objMonitor = new ObjMonitor()
   // Store whether the environment is in an unexpected error state
@@ -42,13 +42,13 @@ class AgentInterface(val universe:EnvObject, val agent:Agent, val task:Task, var
   }
 
   // Run any simplifications that need to be run at initialization
-  val (simplifierSuccess, simplifierErrStr) = SimplifierProcessor.parseSimplificationStr(simplificationStr)
+  val (simplifierSuccess, simplifierErrStr) = simplifierProcessor.parseSimplificationStr(simplificationStr)
   if (!simplifierSuccess) this.setErrorState(simplifierErrStr)
-  println ("Selected simpifications: " + SimplifierProcessor.getSimplificationsUsed())
-  SimplifierProcessor.runSimplificationsInitialization(universe, agent)
+  println ("Selected simpifications: " + simplifierProcessor.getSimplificationsUsed())
+  simplifierProcessor.runSimplificationsInitialization(universe, agent)
 
   // Action handler (must be run after simplifications -- as simplifications can affect action space)
-  val actionHandler = ActionDefinitions.mkActionDefinitions()
+  val actionHandler = ActionDefinitions.mkActionDefinitions(simplifierProcessor)
 
   // Input parser
   val inputParser = new InputParser(actionHandler.getActions())
@@ -170,7 +170,7 @@ class AgentInterface(val universe:EnvObject, val agent:Agent, val task:Task, var
       //println(obj.name)
       // If the electrical simplification is enabled, then remove all electrical terminals from the output list
       var filter:Boolean = false
-      if (SimplifierProcessor.isSimplificationEnabled(SimplifierProcessor.SIMPLIFICATION_NO_ELECTRICAL_ACTION)) {
+      if (simplifierProcessor.isSimplificationEnabled(SimplifierProcessor.SIMPLIFICATION_NO_ELECTRICAL_ACTION)) {
         obj match {
           case term:Terminal => { filter = true }
           case _ => {
@@ -229,7 +229,7 @@ class AgentInterface(val universe:EnvObject, val agent:Agent, val task:Task, var
     val uuid2referentLUTAll = inputParser.getAllUniqueReferentsLUTObjList(allObjects, visibleObjTreeRoot, includeHidden = true, recursive = true)
 
     // Generate all possible valid actions
-    val validActions = ActionDefinitions.mkPossibleActions(agent, allVisibleObjects, allObjects, uuid2referentLUT, uuid2referentLUTAll)
+    val validActions = ActionDefinitions.mkPossibleActions(agent, allVisibleObjects, allObjects, uuid2referentLUT, uuid2referentLUTAll, simplifierProcessor)
 
     return validActions.map(_.mkHumanReadableStr())
   }
@@ -267,7 +267,7 @@ class AgentInterface(val universe:EnvObject, val agent:Agent, val task:Task, var
 
 
     // Generate all possible valid actions
-    val validActions = ActionDefinitions.mkPossibleActions(agent, allVisibleObjects, allObjects, uuid2referentLUT, uuid2referentLUTAll)
+    val validActions = ActionDefinitions.mkPossibleActions(agent, allVisibleObjects, allObjects, uuid2referentLUT, uuid2referentLUTAll, simplifierProcessor)
 
     // To templates
     val validActionsTemplates = validActions.map(_.toTemplate())
@@ -559,7 +559,7 @@ class AgentInterface(val universe:EnvObject, val agent:Agent, val task:Task, var
             universe.tick()
 
             // Run any simplifications that need to be run
-            SimplifierProcessor.runSimplificationsEachTick(universe, agent)
+            simplifierProcessor.runSimplificationsEachTick(universe, agent)
 
             // Increment the number of iterations
             this.curIter += 1

@@ -13,6 +13,7 @@ import scienceworld.objects.electricalcomponent.{PolarizedElectricalComponent, T
 import scienceworld.processes.genetics.ChromosomePair
 
 import scala.reflect.ClassTag
+import scala.util.Random
 
 
 class EnvObject(var name:String, var objType:String, includeElectricalTerminals:Boolean = true) {
@@ -52,7 +53,8 @@ class EnvObject(var name:String, var objType:String, includeElectricalTerminals:
 
 
   // Unique identifier
-  val uuid = UniqueIdentifier.getNextID()
+  //## val uuid = UniqueIdentifier.getNextID()      // Not thread safe
+  val uuid = Random.nextLong()                      // Random, almost guaranteed to be unique, thread safe.
 
   // Properties
   var propMaterial:Option[MaterialProperties] = None

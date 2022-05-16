@@ -192,11 +192,14 @@ class FlowerPot extends Container {
     // DEBUG: Add water if there is none
 
     //println ("### FLOWER POT: Infinite water")
+
+    /*
     if (SimplifierProcessor.isSimplificationEnabled(SimplifierProcessor.SIMPLIFICATION_SELF_WATERING_FLOWER_POTS)) {
       if (this.getContainedObjectsOfType[Water]().size == 0) {
         this.addObject(new Water())
       }
     }
+    */
 
     super.tick()
   }

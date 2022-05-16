@@ -136,7 +136,7 @@ object ExampleRandomAgent {
         println("")
         println("---------------------------------")
         println("Scores:")
-        println("Simplifications: " + SimplifierProcessor.getSimplificationsUsed())
+        println("Simplifications: " + interface.simplifierProcessor.getSimplificationsUsed())
         println("---------------------------------")
         println("maxEpisodes: " + maxEpisodes)
         println("maxIterPerEpisode: " + maxIterPerEpisode)

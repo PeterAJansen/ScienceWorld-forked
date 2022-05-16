@@ -60,7 +60,7 @@ object ActionDefinitions {
    * Main action definitions
    */
 
-  def mkActionDefinitions(): ActionHandler = {
+  def mkActionDefinitions(simplifierProcessor: SimplifierProcessor): ActionHandler = {
     val actionHandler = new ActionHandler()
 
     // Open/close door
@@ -75,7 +75,7 @@ object ActionDefinitions {
     ActionLookAt.registerAction(actionHandler)
     ActionLookIn.registerAction(actionHandler)
 
-    if (!SimplifierProcessor.isSimplificationEnabled(label = SIMPLIFICATION_NAVIGATION_ONLY)) {
+    if (!simplifierProcessor.isSimplificationEnabled(label = SIMPLIFICATION_NAVIGATION_ONLY)) {
       // Activate/Deactivate
       ActionActivate.registerAction(actionHandler)
       ActionDeactivate.registerAction(actionHandler)
@@ -105,7 +105,7 @@ object ActionDefinitions {
       ActionMix.registerAction(actionHandler)
 
       // Connect (electrically)
-      if (!SimplifierProcessor.isSimplificationEnabled(label = SIMPLIFICATION_NO_ELECTRICAL_ACTION)) {
+      if (!simplifierProcessor.isSimplificationEnabled(label = SIMPLIFICATION_NO_ELECTRICAL_ACTION)) {
         ActionConnectElectrical.registerAction(actionHandler)
         ActionDisconnectElectrical.registerAction(actionHandler)
       }
@@ -126,7 +126,7 @@ object ActionDefinitions {
     ActionTaskDesc.registerAction(actionHandler)
 
     // Teleport
-    if (SimplifierProcessor.isSimplificationEnabled(label = SIMPLIFICATION_TELEPORT_ACTION)) {
+    if (simplifierProcessor.isSimplificationEnabled(label = SIMPLIFICATION_TELEPORT_ACTION)) {
       ActionTeleport.registerAction(actionHandler)
     }
 
@@ -137,7 +137,7 @@ object ActionDefinitions {
   /*
    * Make possible actions
    */
-  def mkPossibleActions(agent:Agent, visibleObjects:Array[EnvObject], allObjects:Array[EnvObject], uuid2referentLUT:Map[Long, String], uuid2referentLUTAll:Map[Long, String]):Array[PossibleAction] = {
+  def mkPossibleActions(agent:Agent, visibleObjects:Array[EnvObject], allObjects:Array[EnvObject], uuid2referentLUT:Map[Long, String], uuid2referentLUTAll:Map[Long, String], simplifierProcessor:SimplifierProcessor):Array[PossibleAction] = {
     val out = new ArrayBuffer[PossibleAction]()
 
     // Open/close door
@@ -150,7 +150,7 @@ object ActionDefinitions {
     // Look around
     out.insertAll(out.length, ActionLookAround.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
 
-    if (!SimplifierProcessor.isSimplificationEnabled(label = SIMPLIFICATION_NAVIGATION_ONLY)) {
+    if (!simplifierProcessor.isSimplificationEnabled(label = SIMPLIFICATION_NAVIGATION_ONLY)) {
       // Look at/in
       out.insertAll(out.length, ActionLookAt.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
       out.insertAll(out.length, ActionLookIn.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
@@ -181,7 +181,7 @@ object ActionDefinitions {
       out.insertAll(out.length, ActionFlush.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
 
       // Connect (electrically)
-      if (!SimplifierProcessor.isSimplificationEnabled(label = SIMPLIFICATION_NO_ELECTRICAL_ACTION)) {
+      if (!simplifierProcessor.isSimplificationEnabled(label = SIMPLIFICATION_NO_ELECTRICAL_ACTION)) {
         out.insertAll(out.length, ActionConnectElectrical.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
         out.insertAll(out.length, ActionDisconnectElectrical.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
       }
@@ -203,7 +203,7 @@ object ActionDefinitions {
     out.insertAll(out.length, ActionTaskDesc.generatePossibleValidActions(agent, visibleObjects, uuid2referentLUT))
 
     // Teleport
-    if (SimplifierProcessor.isSimplificationEnabled(label = SIMPLIFICATION_TELEPORT_ACTION)) {
+    if (simplifierProcessor.isSimplificationEnabled(label = SIMPLIFICATION_TELEPORT_ACTION)) {
       out.insertAll(out.length, ActionTeleport.generatePossibleValidActions(agent, allObjects, uuid2referentLUTAll)) // Oracle action, requires allObjects, allUUIDs
     }
 

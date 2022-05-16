@@ -14,8 +14,8 @@ class TaskMaker1() {
   //this.registerTasks(onlySpecificTask)
 
   // Only register this task set, for speed
-  //##TaskFindLivingNonLiving.registerTasks(this)
-  TaskSimpleNavigation.registerTasks(this)
+  TaskFindLivingNonLiving.registerTasks(this)
+  //##TaskSimpleNavigation.registerTasks(this)
 
   /*
    * Accessors

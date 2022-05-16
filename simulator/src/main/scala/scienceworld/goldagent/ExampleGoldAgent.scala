@@ -25,9 +25,10 @@ object ExampleGoldAgent {
     //val specificTasks = Array(9, 10)           // Do specific tasks
     //val specificTasks = Array(18)           // Do specific tasks
     //val specificTasks = Array(10)           // Do specific tasks
+    //val specificTasks = Array(0,1,2,3)           // Do specific tasks
     //val specificTasks = Array.empty[Int]      // Do all
 
-    val exportFilename = "goldsequences-" + specificTasks.mkString("-") + ".json"
+    val exportFilename = "goldsequences-debug" + specificTasks.mkString("-") + ".json"
 
     val simplificationStr = "easy"
 
@@ -179,7 +180,7 @@ object ExampleGoldAgent {
         println("")
         println("---------------------------------")
         println("Scores:")
-        println("Simplifications: " + SimplifierProcessor.getSimplificationsUsed())
+        println("Simplifications: " + interface.simplifierProcessor.getSimplificationsUsed())
         println("---------------------------------")
         println("Total number of variations tested: " + numVariationsTested )
         println("Total number of variations with errors in gold path: " + errors.length)

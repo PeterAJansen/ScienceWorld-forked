@@ -3,7 +3,7 @@ package scienceworld.runtime.pythonapi
 import main.scala.scienceworld.runtime.SimplifierProcessor
 import scienceworld.environments.EnvironmentMaker
 import scienceworld.goldagent.RunHistory
-import scienceworld.input.{ActionDefinitions, InputParser}
+import scienceworld.input.{ActionDefinitions, ActionHandler, InputParser}
 import scienceworld.objects.agent.Agent
 import scienceworld.runtime.AgentInterface
 import scienceworld.struct.EnvObject
@@ -26,7 +26,8 @@ class PythonInterface() {
 
   var agentInterface:Option[AgentInterface] = None
   var agent:Option[Agent] = None
-  val actionHandler = ActionDefinitions.mkActionDefinitions()
+  //var actionHandler:Option[ActionHandler] = None //ActionDefinitions.mkActionDefinitions(simplifierProcessor)
+  val simplifierProcessor = new SimplifierProcessor()
 
   var taskStr:String = ""                // Environment/task name
   var taskVariationIdx:Int = 0           // Task variation seed
@@ -126,7 +127,7 @@ class PythonInterface() {
     if (task.isDefined) {
       this.errorUnknownEnvironment = false
       agent = Some(agent_)
-      agentInterface = Some(new AgentInterface(universe, agent.get, task.get, simplificationStr))
+      agentInterface = Some(new AgentInterface(universe, agent.get, task.get, simplifierProcessor, simplificationStr))
 
       // Reset run history
       val taskIdx = this.getTaskNames().indexOf(taskStr)
@@ -226,11 +227,11 @@ class PythonInterface() {
    * Simplifications
    */
   def getSimplificationsUsed():String = {
-    return SimplifierProcessor.getSimplificationsUsed()
+    return simplifierProcessor.getSimplificationsUsed()
   }
 
   def getPossibleSimplifications():String = {
-    return SimplifierProcessor.getPossibleSimplifications()
+    return simplifierProcessor.getPossibleSimplifications()
   }
 
 

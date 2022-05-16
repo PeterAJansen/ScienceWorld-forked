@@ -76,7 +76,7 @@ object EntryPoint {
     println ("Task: " + interface.getTaskDescription() )
 
     // Simplifications
-    println ("Possible simplifications: " + SimplifierProcessor.getPossibleSimplifications())
+    println ("Possible simplifications: " + interface.simplifierProcessor.getPossibleSimplifications())
 
     // DEBUG: Set the task/goals
     var curIter:Int = 0
