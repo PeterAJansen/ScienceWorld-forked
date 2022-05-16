@@ -48,7 +48,7 @@ class TaskIdentifyLifeStages2(val mode:String = MODE_LIFESTAGES) extends TaskPar
     i <- plantsAndStages
   } yield List(i)
 
-  println("Number of combinations: " + combinations.length)
+  //## println("Number of combinations: " + combinations.length)
 
   def numCombinations():Int = this.combinations.size
 
@@ -65,7 +65,7 @@ class TaskIdentifyLifeStages2(val mode:String = MODE_LIFESTAGES) extends TaskPar
   private def setupCombination(modifiers:Array[TaskModifier], universe:EnvObject, agent:Agent):(Boolean, String) = {
     // Run each modifier's change on the universe
     for (mod <- modifiers) {
-      println("Running modifier: " + mod.toString)
+      //## println("Running modifier: " + mod.toString)
       val success = mod.runModifier(universe, agent)
       if (!success) {
         return (false, "ERROR: Error running one or more modifiers while setting up task environment.")

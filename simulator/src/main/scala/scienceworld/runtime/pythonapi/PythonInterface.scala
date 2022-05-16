@@ -368,12 +368,12 @@ class PythonInterface() {
     // Store in history
     currentHistory.addStep(userInputString, (description, score_, isCompleted_), freelookStr, inventoryStr)
 
-    println("Description: ")
-    println(description)
+    //println("Description: ")
+    //println(description)
 
     // DEBUG
     val referents = InputParser.getPossibleReferents(agentInterface.get.getAgentVisibleObjects()._2, agentContainer)
-    println("Possible referents: " + referents.mkString(", "))
+    //println("Possible referents: " + referents.mkString(", "))
 
     if (description.length > 0) {
       outStr.append(description)
@@ -382,7 +382,7 @@ class PythonInterface() {
     }
     //outStr.append("\nPossible referents: " + referents.mkString(", "))
 
-    println ("step() finished.")
+    //println ("step() finished.")
 
     // Return
     return outStr.toString()

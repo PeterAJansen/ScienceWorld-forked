@@ -144,7 +144,7 @@ class SimplifierProcessor {
       breakable {
         for (s <- allSimplifications) {
           if (s.label.toLowerCase == field.trim()) {
-            println("Adding simplification: (" + s.label + "): " + s.description)
+            //## println("Adding simplification: (" + s.label + "): " + s.description)
             this.addSimplification(s)
             break()
           }

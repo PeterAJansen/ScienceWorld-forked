@@ -99,7 +99,7 @@ class TaskElectricalConductivity2(val mode:String = MODE_TEST_CONDUCTIVITY_UNKNO
     n <- answerBoxes
   } yield List(i, j, m, n)
 
-  println("Number of combinations: " + combinations.length)
+  //## println("Number of combinations: " + combinations.length)
 
   def numCombinations():Int = this.combinations.size
 
@@ -116,7 +116,7 @@ class TaskElectricalConductivity2(val mode:String = MODE_TEST_CONDUCTIVITY_UNKNO
   private def setupCombination(modifiers:Array[TaskModifier], universe:EnvObject, agent:Agent):(Boolean, String) = {
     // Run each modifier's change on the universe
     for (mod <- modifiers) {
-      println("Running modifier: " + mod.toString)
+      //## println("Running modifier: " + mod.toString)
       val success = mod.runModifier(universe, agent)
       if (!success) {
         return (false, "ERROR: Error running one or more modifiers while setting up task environment.")

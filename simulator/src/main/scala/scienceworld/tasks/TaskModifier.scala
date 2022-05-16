@@ -82,7 +82,7 @@ class TaskObject(val name:String, val exampleInstance:Option[EnvObject], val roo
               for (ccObj <- containedObjects1) {
                 if (ccObj.name == name) {
                   // An existing object with this name has been found -- exit
-                  println("### TaskObject: Existing object with that name (" + name + ") has been found in container (" + ccObj.name + ")")
+                  //##println("### TaskObject: Existing object with that name (" + name + ") has been found in container (" + ccObj.name + ")")
                   if (!forceAdd) return true
                 }
               }
@@ -95,7 +95,7 @@ class TaskObject(val name:String, val exampleInstance:Option[EnvObject], val roo
         if ((possibleContainerNames.length == 0) || ((possibleContainerNames.length == 1) && (possibleContainerNames(0).length == 0))) {
           // CASE 1: Just generate in the main container
           obj.addObject( exampleInstance.get )
-          println("### TaskObject: Adding object (" + exampleInstance.get.name + ") to (" + obj.name + ")")
+          //##println("### TaskObject: Adding object (" + exampleInstance.get.name + ") to (" + obj.name + ")")
         } else {
           // CASE 2: Generate in a sub-container of the main container
           val containedObjects = Random.shuffle( obj.getContainedObjectsRecursive().toArray.sortBy(_.uuid).toList )     // Since the order of a set is not guaranteed, this tries to keep it the same between runs (by sorting) so the generation is deterministic
@@ -103,7 +103,7 @@ class TaskObject(val name:String, val exampleInstance:Option[EnvObject], val roo
           for (cObj <- containedObjects) {
             if (possibleContainerNames.contains(cObj.name)) {
               // Add to this container
-              println("### TaskObject: Adding object (" + exampleInstance.get.name + ") to (" + cObj.name + ")")
+              //##println("### TaskObject: Adding object (" + exampleInstance.get.name + ") to (" + cObj.name + ")")
               cObj.addObject( exampleInstance.get )
               return true
             }

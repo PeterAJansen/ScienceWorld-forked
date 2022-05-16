@@ -53,7 +53,9 @@ class ActionHandler {
 
     // Then, run actions
     for (action <- actionsToRun) {
-      println ("Running action: " + action.name)
+      if (action.name != "look around" && (action.name != "view inventory")) {
+        println("Running action: " + action.name)
+      }
 
       val (resultDesc, success) = action.runAction()
 
