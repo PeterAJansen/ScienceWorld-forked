@@ -11,7 +11,7 @@ import scala.collection.mutable.ArrayBuffer
 import scala.util.Random
 
 
-class ThreadedCrawler(val id:Int, val _taskIdx:Int, val _varIdx:Int, val _actionsSoFar:Array[String], val _maxDistance:Int, val _simplificationStr:String, val _goldPath:Array[String], val _goldPathSet:Set[String]) extends Thread {
+class ThreadedCrawler(val id:Int, val _taskIdx:Int, val _varIdx:Int, val _actionsSoFar:Array[String], val _maxDistance:Int, val _simplificationStr:String, val _goldPath:Array[String], val _goldPathSet:Set[String], _debugMaxLength:Int) extends Thread {
   private var isRunning:Boolean = false
   private var isWinning:Boolean = false
   private var isCompleted:Boolean = false
@@ -61,10 +61,11 @@ class ThreadedCrawler(val id:Int, val _taskIdx:Int, val _varIdx:Int, val _action
   }
 
 
-  def crawlAroundGoldPath(taskIdx:Int, varIdx:Int, actionsSoFar:Array[String], maxDistance:Int, simplificationStr:String, goldPath:Array[String], goldPathSet:Set[String], spawnThreads:Boolean = false): Unit = {
+  def crawlAroundGoldPath(taskIdx:Int, varIdx:Int, actionsSoFar:Array[String], maxDistance:Int, simplificationStr:String, goldPath:Array[String], goldPathSet:Set[String], debugMaxLength:Int, spawnThreads:Boolean = false): Unit = {
 
     // Stop condition
     if (actionsSoFar.length > goldPath.size + maxDistance) return
+    if ((debugMaxLength > 0) && (actionsSoFar.length > debugMaxLength)) return
 
     println("Path: " + actionsSoFar.mkString(", ") )
 
@@ -87,13 +88,13 @@ class ThreadedCrawler(val id:Int, val _taskIdx:Int, val _varIdx:Int, val _action
         //crawlAroundGoldPath(taskIdx, varIdx, newActionSeq, maxDistance, simplificationStr, goldPath, goldPathSet)
         if (spawnThreads) {
           // This will probably explode, should likely never be used
-          val th = new ThreadedCrawler(id = Random.nextInt(100000), taskIdx, varIdx, newActionSeq, maxDistance, simplificationStr, goldPath, goldPathSet)
+          val th = new ThreadedCrawler(id = Random.nextInt(100000), taskIdx, varIdx, newActionSeq, maxDistance, simplificationStr, goldPath, goldPathSet, debugMaxLength)
           th.run()
           // TODO: Wait?
 
         } else {
           // Do not spawn a new thread, but use the current thread
-          this.crawlAroundGoldPath(taskIdx, varIdx, newActionSeq, maxDistance, simplificationStr, goldPath, goldPathSet, spawnThreads = false)
+          this.crawlAroundGoldPath(taskIdx, varIdx, newActionSeq, maxDistance, simplificationStr, goldPath, goldPathSet, debugMaxLength, spawnThreads = false)
         }
 
       } else {
@@ -111,7 +112,7 @@ class ThreadedCrawler(val id:Int, val _taskIdx:Int, val _varIdx:Int, val _action
     this.isRunning = true
     if (verboseDebugOutput) println("Thread " + Thread.currentThread().getName() + " is running.")
 
-    this.crawlAroundGoldPath(_taskIdx, _varIdx, actionsSoFar = Array.empty[String], _maxDistance, _simplificationStr, _goldPath, _goldPathSet)
+    this.crawlAroundGoldPath(_taskIdx, _varIdx, _actionsSoFar, _maxDistance, _simplificationStr, _goldPath, _goldPathSet, _debugMaxLength)
 
     this.isRunning = false
     this.isCompleted = true
@@ -186,10 +187,11 @@ object OfflineCrawler {
   }
 
 
-  def crawlAroundGoldPath(taskIdx:Int, varIdx:Int, actionsSoFar:Array[String], maxDistance:Int, simplificationStr:String, goldPath:Array[String], goldPathSet:Set[String]): Unit = {
+  def crawlAroundGoldPath(taskIdx:Int, varIdx:Int, actionsSoFar:Array[String], maxDistance:Int, simplificationStr:String, goldPath:Array[String], goldPathSet:Set[String], debugMaxLength:Int = -1): Unit = {
 
     // Stop condition
     if (actionsSoFar.length > goldPath.size + maxDistance) return
+    if ((debugMaxLength > 0) && (actionsSoFar.length > debugMaxLength)) return
 
     println("Path: " + actionsSoFar.mkString(", ") )
 
@@ -211,7 +213,7 @@ object OfflineCrawler {
         println("** Calling: " + newActionSeq.mkString(", ") + " (differences: " + differences.mkString(", ") + ")")
 
         // Normal, non-threaded
-        crawlAroundGoldPath(taskIdx, varIdx, newActionSeq, maxDistance, simplificationStr, goldPath, goldPathSet)
+        crawlAroundGoldPath(taskIdx, varIdx, newActionSeq, maxDistance, simplificationStr, goldPath, goldPathSet, debugMaxLength)
 
       } else {
         println("Gold Path: " + goldPath.mkString(", "))
@@ -224,10 +226,11 @@ object OfflineCrawler {
   }
 
 
-  def crawlAroundGoldPathThreaded(taskIdx:Int, varIdx:Int, actionsSoFar:Array[String], maxDistance:Int, simplificationStr:String, goldPath:Array[String], goldPathSet:Set[String]): Unit = {
+  def crawlAroundGoldPathThreaded(taskIdx:Int, varIdx:Int, actionsSoFar:Array[String], maxDistance:Int, simplificationStr:String, goldPath:Array[String], goldPathSet:Set[String], debugMaxLength:Int = -1): Unit = {
 
     // Stop condition
     if (actionsSoFar.length > goldPath.size + maxDistance) return
+    if ((debugMaxLength > 0) && (actionsSoFar.length > debugMaxLength)) return
 
     println("Path: " + actionsSoFar.mkString(", ") )
 
@@ -255,7 +258,7 @@ object OfflineCrawler {
         // crawlAroundGoldPath(taskIdx, varIdx, newActionSeq, maxDistance, simplificationStr, goldPath, goldPathSet)
 
         // Threaded
-        val thread = new ThreadedCrawler(id = threadsOut.length, taskIdx, varIdx, newActionSeq, maxDistance, simplificationStr, goldPath, goldPathSet)
+        val thread = new ThreadedCrawler(id = threadsOut.length, taskIdx, varIdx, newActionSeq, maxDistance, simplificationStr, goldPath, goldPathSet, debugMaxLength)
         threadsOut.append( (thread, actionStr) )
         thread.start()
 
@@ -335,10 +338,10 @@ object OfflineCrawler {
     //this.crawlAroundGoldPath(taskIdx, varIdx, actionsSoFar = Array.empty[String], maxDistance = 1, simplificationStr, goldPath = goldActions, goldPathSet = goldActions.toSet)
 
     // Non-threaded
-    //this.crawlAroundGoldPath(taskIdx, varIdx, actionsSoFar = Array.empty[String], maxDistance = 0, simplificationStr, goldPath = goldActions, goldPathSet = goldActions.toSet)
+    this.crawlAroundGoldPath(taskIdx, varIdx, actionsSoFar = Array.empty[String], maxDistance = 1, simplificationStr, goldPath = goldActions, goldPathSet = goldActions.toSet, debugMaxLength = 3)
 
     // Threaded
-    this.crawlAroundGoldPathThreaded(taskIdx, varIdx, actionsSoFar = Array.empty[String], maxDistance = 1, simplificationStr, goldPath = goldActions, goldPathSet = goldActions.toSet)
+    //this.crawlAroundGoldPathThreaded(taskIdx, varIdx, actionsSoFar = Array.empty[String], maxDistance = 1, simplificationStr, goldPath = goldActions, goldPathSet = goldActions.toSet, debugMaxLength = 2)
 
     val deltaTime = System.currentTimeMillis() - startTime
     println("Total execution time: " + deltaTime + " msec")
