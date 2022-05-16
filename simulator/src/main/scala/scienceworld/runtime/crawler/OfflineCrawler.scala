@@ -13,6 +13,8 @@ import scala.util.Random
 object ThreadTracker {
   var threadNum:Int = 0
   val runningThreads = mutable.Set[ThreadedCrawler]()
+  var lastTimeThreadSpawned:Long = 0
+
 
   def getNextThreadID():Int = synchronized {
     this.threadNum += 1
@@ -22,7 +24,7 @@ object ThreadTracker {
   def isAvailableThread():Boolean = synchronized {
     println ("NumActiveThreads (1): " + this.runningThreads.size)
 
-    if (this.runningThreads.size < 5000) {
+    if (this.runningThreads.size < 1000) {
       return true
     } else {
       return false
@@ -30,14 +32,23 @@ object ThreadTracker {
   }
 
   def registerRunningThread(th:ThreadedCrawler):Unit = synchronized {
+    lastTimeThreadSpawned = System.currentTimeMillis()
     this.runningThreads.add( th )
+  }
+
+  def removeThread(th:ThreadedCrawler):Unit = synchronized {
+    this.runningThreads.remove(th)
+  }
+
+  def getTimeSinceLastThreadSpawned():Long = {
+    return System.currentTimeMillis() - this.lastTimeThreadSpawned
   }
 
   // Remove any finished threads
   def examineFinishedThreads():Int = synchronized {
-    for (th <- this.runningThreads) {
-      if (!th.isThreadRunning()) this.runningThreads.remove(th)
-    }
+    //for (th <- this.runningThreads) {
+      //if (!th.isThreadRunning()) this.removeThread(th)
+    //}
 
     println ("NumActiveThreads: " + this.runningThreads.size)
 
@@ -158,6 +169,8 @@ class ThreadedCrawler(val id:Int, val _taskIdx:Int, val _varIdx:Int, val _action
 
     this.isRunning = false
     this.isCompleted = true
+
+    ThreadTracker.removeThread(this)
   }
 
 
@@ -318,19 +331,29 @@ object OfflineCrawler {
     var done:Boolean = false
 
     var numChecksWithZero:Int = 0
-    while ((done == false) && (numChecksWithZero > 50)) {
+    while ((done == false) && (numChecksWithZero < 1000)) {
 
       done = true
 
       // Heartbeat for creating new threads
+      val numRunningThreads1 = ThreadTracker.examineFinishedThreads()
+      Thread.sleep(1)
+
+      val timeSinceLastThreadSpawned = ThreadTracker.getTimeSinceLastThreadSpawned()
+      println("TimeSinceLastThreadSpawned: " + timeSinceLastThreadSpawned)
+
+
       val numRunningThreads = ThreadTracker.examineFinishedThreads()
-      if (numRunningThreads > 0) {
+      if ((numRunningThreads > 0) && (timeSinceLastThreadSpawned < 2000)) {
         done = false
         numChecksWithZero = 0
       } else {
         numChecksWithZero += 1
       }
 
+
+
+      /*
       println ("NumThreads: " + threadsOut.length)
 
       breakable {
@@ -342,11 +365,16 @@ object OfflineCrawler {
           }
         }
       }
+      */
 
-      Thread.sleep(10)
+      Thread.sleep(1)
     }
 
     // If we reach here, the threads should all have completed
+    Thread.sleep(100)
+    println("********** Should be done")
+    ThreadTracker.examineFinishedThreads()
+    println("TimeSinceLastThreadSpawned: " + ThreadTracker.getTimeSinceLastThreadSpawned())
 
   }
 
@@ -399,9 +427,13 @@ object OfflineCrawler {
     // Threaded
     this.crawlAroundGoldPathThreaded(taskIdx, varIdx, actionsSoFar = Array.empty[String], maxDistance = 1, simplificationStr, goldPath = goldActions, goldPathSet = goldActions.toSet, debugMaxLength = 5)
 
-    Thread.sleep(10000)    // Wait briefly for any console output from the threads to complete
-
     val deltaTime = System.currentTimeMillis() - startTime
+    println("Total execution time: " + deltaTime + " msec")
+
+    Thread.sleep(1000)    // Wait briefly for any console output from the threads to complete
+
+    ThreadTracker.examineFinishedThreads()
+
     println("Total execution time: " + deltaTime + " msec")
 
 
