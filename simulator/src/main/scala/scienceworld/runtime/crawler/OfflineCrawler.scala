@@ -59,7 +59,7 @@ object ThreadTracker {
 
 
 
-class ThreadedCrawler(val id:Int, val _taskIdx:Int, val _varIdx:Int, val _actionsSoFar:Array[String], val _maxDistance:Int, val _simplificationStr:String, val _goldPath:Array[String], val _goldPathSet:Set[String], _debugMaxLength:Int) extends Thread {
+class ThreadedCrawler(val id:Int, val _taskIdx:Int, val _varIdx:Int, val _actionsSoFar:Array[String], val _maxDistance:Int, val _simplificationStr:String, val _allowableActionStarts:Set[String], val _goldPath:Array[String], val _goldPathSet:Set[String], _debugMaxLength:Int) extends Thread {
   private var isRunning:Boolean = false
   private var isWinning:Boolean = false
   private var isCompleted:Boolean = false
@@ -109,7 +109,7 @@ class ThreadedCrawler(val id:Int, val _taskIdx:Int, val _varIdx:Int, val _action
   }
 
 
-  def crawlAroundGoldPath(taskIdx:Int, varIdx:Int, actionsSoFar:Array[String], maxDistance:Int, simplificationStr:String, goldPath:Array[String], goldPathSet:Set[String], debugMaxLength:Int, spawnThreads:Boolean = false): Unit = {
+  def crawlAroundGoldPath(taskIdx:Int, varIdx:Int, actionsSoFar:Array[String], maxDistance:Int, simplificationStr:String, allowableActionStarts:Set[String], goldPath:Array[String], goldPathSet:Set[String], debugMaxLength:Int, spawnThreads:Boolean = false): Unit = {
 
     // Stop condition
     if (actionsSoFar.length > goldPath.size + maxDistance) return
@@ -135,19 +135,22 @@ class ThreadedCrawler(val id:Int, val _taskIdx:Int, val _varIdx:Int, val _action
         //##println("** Thread " + Thread.currentThread().getName() + " Calling: " + newActionSeq.mkString(", ") + " (differences: " + differences.mkString(", ") + ")")
         //crawlAroundGoldPath(taskIdx, varIdx, newActionSeq, maxDistance, simplificationStr, goldPath, goldPathSet)
 
-        if (ThreadTracker.isAvailableThread()) {
-          //TODO  This will probably explode, should likely never be used
-          val id = ThreadTracker.getNextThreadID()
+        val actionStart = actionStr.split(" ")(0)   // Only continue with this action if it's on the list of allowed actions
+        if ((allowableActionStarts.isEmpty) || (allowableActionStarts.contains(actionStart))) {
 
-          val th = new ThreadedCrawler(id = Random.nextInt(100000), taskIdx, varIdx, newActionSeq, maxDistance, simplificationStr, goldPath, goldPathSet, debugMaxLength)
-          ThreadTracker.registerRunningThread(th)
-          th.start()
 
-          // TODO: Wait?
+          if (ThreadTracker.isAvailableThread()) {
+            val id = ThreadTracker.getNextThreadID()
 
-        } else {
-          // Do not spawn a new thread, but use the current thread
-          this.crawlAroundGoldPath(taskIdx, varIdx, newActionSeq, maxDistance, simplificationStr, goldPath, goldPathSet, debugMaxLength, spawnThreads = false)
+            val th = new ThreadedCrawler(id = Random.nextInt(100000), taskIdx, varIdx, newActionSeq, maxDistance, simplificationStr, allowableActionStarts, goldPath, goldPathSet, debugMaxLength)
+            ThreadTracker.registerRunningThread(th)
+            th.start()
+
+          } else {
+            // Do not spawn a new thread, but use the current thread
+            this.crawlAroundGoldPath(taskIdx, varIdx, newActionSeq, maxDistance, simplificationStr, allowableActionStarts, goldPath, goldPathSet, debugMaxLength, spawnThreads = false)
+          }
+
         }
 
       } else {
@@ -165,7 +168,7 @@ class ThreadedCrawler(val id:Int, val _taskIdx:Int, val _varIdx:Int, val _action
     this.isRunning = true
     if (verboseDebugOutput) println("Thread " + Thread.currentThread().getName() + " is running.")
 
-    this.crawlAroundGoldPath(_taskIdx, _varIdx, _actionsSoFar, _maxDistance, _simplificationStr, _goldPath, _goldPathSet, _debugMaxLength)
+    this.crawlAroundGoldPath(_taskIdx, _varIdx, _actionsSoFar, _maxDistance, _simplificationStr, _allowableActionStarts, _goldPath, _goldPathSet, _debugMaxLength)
 
     this.isRunning = false
     this.isCompleted = true
@@ -242,7 +245,7 @@ object OfflineCrawler {
   }
 
 
-  def crawlAroundGoldPath(taskIdx:Int, varIdx:Int, actionsSoFar:Array[String], maxDistance:Int, simplificationStr:String, goldPath:Array[String], goldPathSet:Set[String], debugMaxLength:Int = -1): Unit = {
+  def crawlAroundGoldPath(taskIdx:Int, varIdx:Int, actionsSoFar:Array[String], maxDistance:Int, simplificationStr:String, allowableActionStarts:Set[String], goldPath:Array[String], goldPathSet:Set[String], debugMaxLength:Int = -1): Unit = {
 
     // Stop condition
     if (actionsSoFar.length > goldPath.size + maxDistance) return
@@ -268,7 +271,10 @@ object OfflineCrawler {
         println("** Calling: " + newActionSeq.mkString(", ") + " (differences: " + differences.mkString(", ") + ")")
 
         // Normal, non-threaded
-        crawlAroundGoldPath(taskIdx, varIdx, newActionSeq, maxDistance, simplificationStr, goldPath, goldPathSet, debugMaxLength)
+        val actionStart = actionStr.split(" ")(0)   // Only continue with this action if it's on the list of allowed actions
+        if ((allowableActionStarts.isEmpty) || (allowableActionStarts.contains(actionStart))) {
+          crawlAroundGoldPath(taskIdx, varIdx, newActionSeq, maxDistance, simplificationStr, allowableActionStarts, goldPath, goldPathSet, debugMaxLength)
+        }
 
       } else {
         println("Gold Path: " + goldPath.mkString(", "))
@@ -281,7 +287,7 @@ object OfflineCrawler {
   }
 
 
-  def crawlAroundGoldPathThreaded(taskIdx:Int, varIdx:Int, actionsSoFar:Array[String], maxDistance:Int, simplificationStr:String, goldPath:Array[String], goldPathSet:Set[String], debugMaxLength:Int = -1): Unit = {
+  def crawlAroundGoldPathThreaded(taskIdx:Int, varIdx:Int, actionsSoFar:Array[String], maxDistance:Int, simplificationStr:String, allowableActionStarts:Set[String], goldPath:Array[String], goldPathSet:Set[String], debugMaxLength:Int = -1): Unit = {
 
     // Stop condition
     if (actionsSoFar.length > goldPath.size + maxDistance) return
@@ -313,11 +319,13 @@ object OfflineCrawler {
         // crawlAroundGoldPath(taskIdx, varIdx, newActionSeq, maxDistance, simplificationStr, goldPath, goldPathSet)
 
         // Threaded
-
-        val thread = new ThreadedCrawler(id = ThreadTracker.getNextThreadID(), taskIdx, varIdx, newActionSeq, maxDistance, simplificationStr, goldPath, goldPathSet, debugMaxLength)
-        threadsOut.append( (thread, actionStr) )
-        ThreadTracker.registerRunningThread(thread)
-        thread.start()
+        val actionStart = actionStr.split(" ")(0)   // Only continue with this action if it's on the list of allowed actions
+        if ((allowableActionStarts.isEmpty) || (allowableActionStarts.contains(actionStart))) {
+          val thread = new ThreadedCrawler(id = ThreadTracker.getNextThreadID(), taskIdx, varIdx, newActionSeq, maxDistance, simplificationStr, allowableActionStarts, goldPath, goldPathSet, debugMaxLength)
+          threadsOut.append((thread, actionStr))
+          ThreadTracker.registerRunningThread(thread)
+          thread.start()
+        }
 
       } else {
         //## println("Gold Path: " + goldPath.mkString(", "))
@@ -424,11 +432,15 @@ object OfflineCrawler {
     // Non-threaded
     //this.crawlAroundGoldPath(taskIdx, varIdx, actionsSoFar = Array.empty[String], maxDistance = 1, simplificationStr, goldPath = goldActions, goldPathSet = goldActions.toSet, debugMaxLength = 3)
 
+
+
     // Threaded
-    this.crawlAroundGoldPathThreaded(taskIdx, varIdx, actionsSoFar = Array.empty[String], maxDistance = 1, simplificationStr, goldPath = goldActions, goldPathSet = goldActions.toSet, debugMaxLength = 5)
+    this.crawlAroundGoldPathThreaded(taskIdx, varIdx, actionsSoFar = Array.empty[String], maxDistance = 2, simplificationStr, allowableActionStarts.toSet, goldPath = goldActions, goldPathSet = goldActions.toSet, debugMaxLength = 4)
 
     val deltaTime = System.currentTimeMillis() - startTime
     println("Total execution time: " + deltaTime + " msec")
+
+    println("Gold actions: " + goldActions.mkString(", "))
 
     Thread.sleep(1000)    // Wait briefly for any console output from the threads to complete
 
